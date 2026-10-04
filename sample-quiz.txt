@@ -1,0 +1,7 @@
+Title: Contoh Kuis dari File TXT
+
+Siapa yang tinggal di hutan hijau? | *Benny si kelinci | Naga terbang | Anjing kota | Ikan laut
+Apa yang dimakan Benny setiap hari? | Permen | *Wortel segar | Pizza | Es krim
+Mengapa Benny membantu temannya? | *Dia baik hati | Dia ingin permen | Dia merasa bosan | Dia marah
+Siapa yang merasa aman di hutan? | Hanya pemburu | Tidak ada siapa pun | *Para hewan | Hanya pengunjung
+Apa yang membuat hutan terasa aman? | Tembok besar | *Benny tidak menyakiti siapa pun | Tidak ada hewan | Suara keras

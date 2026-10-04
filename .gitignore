@@ -1,0 +1,8 @@
+# Local app state (Freebuff workspace metadata)
+.freebuff/
+
+# Transient local backup of index.html (0.000.001.html is the documented backup)
+index.html.bak
+
+# Node (none needed, but keep installs out if added later)
+node_modules/

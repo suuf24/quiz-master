@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Tes Wawasanmu</title>
+    <style>
+        /* Modern Reset & Base Styles */
+        :root {
+            --primary-bg: #f8f9fa;
+            /* White Base */
+            --glass-bg: #ffffff;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --text-color: #2d3436;
+            --accent-color: #0984e3;
+            /* Bright Blue */
+            --secondary-color: #a29bfe;
+            /* Lavender */
+            --correct-color: #00b894;
+            /* Mint Green */
+            --wrong-color: #ff7675;
+            /* Salmon Red */
+            --button-hover: #dfe6e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--primary-bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Animated Background Shapes */
+        .background-shapes div {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(120deg, #a29bfe, #74b9ff, #55efc4);
+            animation: float 20s infinite linear;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .shape1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .shape2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s !important;
+        }
+
+        .shape3 {
+            width: 150px;
+            height: 150px;
+            top: 40%;
+            left: 80%;
+            animation-delay: -10s !important;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(50px, 50px) rotate(180deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Glassmorphism Container */
+        .quiz-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Question Section */
+        .question-card {
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #dfe6e9;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: var(--text-color);
+            text-align: left;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+
+        .option-btn:hover {
+            background: var(--button-hover);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .option-btn.selected {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            transform: scale(1.02);
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.4);
+        }
+
+        /* Navigation Buttons */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 132, 227, 0.4);
+            background: #74b9ff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            text-align: center;
+            animation: zoomIn 0.5s ease;
+        }
+
+        .results-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            box-shadow: 0 0 30px rgba(9, 132, 227, 0.2);
+            color: var(--accent-color);
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        /* Review List */
+        .review-list {
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding-right: 10px;
+        }
+
+        /* Custom Scrollbar for review list */
+        .review-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .review-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .review-list::-webkit-scrollbar-thumb {
+            background: #b2bec3;
+            border-radius: 4px;
+        }
+
+        .review-list::-webkit-scrollbar-thumb:hover {
+            background: #636e72;
+        }
+
+        .review-item {
+            background: #f8f9fa;
+            border: 1px solid #e1e1e1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid transparent;
+        }
+
+        .review-item.correct {
+            border-left-color: var(--correct-color);
+        }
+
+        .review-item.wrong {
+            border-left-color: var(--wrong-color);
+        }
+
+        .review-q {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .review-ans {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .review-ans span {
+            font-weight: bold;
+        }
+
+        .text-correct {
+            color: var(--correct-color);
+        }
+
+        .text-wrong {
+            color: var(--wrong-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-box {
+            background: #ffffff;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .nav-box:hover {
+            background: var(--button-hover);
+        }
+
+        .nav-box.active {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+            transform: scale(1.1);
+        }
+
+        .nav-box.answered {
+            background: var(--correct-color);
+            color: #fff;
+            border-color: var(--correct-color);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .quiz-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .option-btn {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Social Media Footer */
+        .app-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-icon {
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+        }
+
+        .social-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-instagram:hover {
+            color: #E1306C;
+        }
+
+        .social-github:hover {
+            color: #333;
+        }
+
+        .social-whatsapp:hover {
+            color: #25D366;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animation -->
+    <div class="background-shapes">
+        <div class="shape1"></div>
+        <div class="shape2"></div>
+        <div class="shape3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="quiz-container">
+
+        <!-- Welcome / Game Screen -->
+        <header id="game-header">
+            <h1>Simple Present Non Verbal Trainer</h1>
+            <div class="quiz-info">
+                <span id="question-counter">Soal 1 / 10</span>
+                <span id="score-display" style="display:none;">Score: 0</span>
+            </div>
+        </header>
+
+        <!-- Question Section -->
+        <div id="quiz-area">
+            <!-- Questions will be injected here by JS -->
+        </div>
+
+        <!-- Navigation Grid -->
+        <div id="game-nav" class="nav-grid"></div>
+
+        <!-- Controls -->
+        <div class="controls" id="game-controls">
+            <!-- Dynamic button (Next/Submit) -->
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-area" class="results-section">
+            <h2>Kuis Selesai!</h2>
+            <div class="score-circle" id="final-score">0</div>
+            <p class="score-text" id="status-message">Luar Biasa!</p>
+
+            <p style="margin-bottom: 20px; color: #636e72; font-style: italic;">
+                Enjoy endless practice! This app generates a new set of questions for every session.
+            </p>
+
+            <button class="btn" onclick="app.init()">Main Lagi</button>
+
+            <div class="review-list" id="review-container">
+                <!-- Review items injected here -->
+            </div>
+        </div>
+
+        <!-- APP Footer -->
+        <footer class="app-footer">
+            <a href="https://www.instagram.com/suuf24/" target="_blank" class="social-icon social-instagram"
+                title="Instagram">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+            </a>
+            <a href="https://github.com/suuf24" target="_blank" class="social-icon social-github" title="GitHub">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+            </a>
+            <a href="https://wa.me/6285103974297" target="_blank" class="social-icon social-whatsapp" title="WhatsApp">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                </svg>
+            </a>
+        </footer>
+    </div>
+
+    </div>
+
+    <script>
+        /**
+         * Quiz Master Logic
+         * - Pure Vanilla JS
+         * - Random Questions & Options
+         * - No External Dependencies
+         */
+
+        const masterData = [
+    { q: "I ____ happy today.", a: ["am", "is", "are", "be"], correct: "am" },
+    { q: "She ____ very kind.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "They ____ ready now.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "He ____ my best friend.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "We ____ in the classroom.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "It ____ very cold.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "You ____ smart.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "The cat ____ sleepy.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "I ____ not tired.", a: ["am", "is", "are", "be"], correct: "am" },
+    { q: "She ____ not angry.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "They ____ not late.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "He ____ not at home.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "We ____ not busy.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "It ____ not broken.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "You ____ not wrong.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "The dogs ____ hungry.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "My brother ____ tall.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "The students ____ quiet.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "I ____ a teacher.", a: ["am", "is", "are", "be"], correct: "am" },
+    { q: "She ____ my sister.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "They ____ my neighbors.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "He ____ very funny.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "We ____ friends.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "It ____ blue.", a: ["is", "am", "are", "be"], correct: "is" },
+    { q: "You ____ my hero.", a: ["are", "is", "am", "be"], correct: "are" },
+	{ q: "The group of students ____ very noisy today.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "My favorite books ____ on the table.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "Each child ____ responsible for their bag.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "The number of visitors ____ high this week.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "A pair of shoes ____ under the bed.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "The children in the playground ____ very active.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "Neither the teacher nor the students ____ ready.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "Everyone in this room ____ excited.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Some of the water ____ dirty.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Many of the players ____ tired after the match.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "The news ____ surprising today.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Mathematics ____ my favorite subject.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "The team ____ confident about winning.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Your glasses ____ on your head.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "One of my friends ____ absent today.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "The police ____ nearby.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "A lot of information ____ missing.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Both of the answers ____ correct.", a: ["are", "is", "am", "be"], correct: "are" },
+    { q: "The furniture ____ very modern.", a: ["is", "are", "am", "be"], correct: "is" },
+    { q: "Each of the players ____ ready to start.", a: ["is", "are", "am", "be"], correct: "is" },
+	{ q: "I ____ ready.", a: ["am","is","are","be"], correct: "am" },
+{ q: "The boys ____ in the yard.", a: ["are","is","am","be"], correct: "are" },
+{ q: "She ____ my teacher.", a: ["is","am","are","be"], correct: "is" },
+{ q: "The group of players ____ strong.", a: ["is","are","am","be"], correct: "is" },
+{ q: "We ____ not late.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Each student ____ responsible.", a: ["is","are","am","be"], correct: "is" },
+{ q: "They ____ happy today.", a: ["are","is","am","be"], correct: "are" },
+{ q: "My brother ____ at home.", a: ["is","are","am","be"], correct: "is" },
+{ q: "You ____ not wrong.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The cat ____ under the chair.", a: ["is","are","am","be"], correct: "is" },
+
+{ q: "The children ____ very noisy.", a: ["are","is","am","be"], correct: "are" },
+{ q: "A pair of socks ____ missing.", a: ["is","are","am","be"], correct: "is" },
+{ q: "It ____ cold outside.", a: ["is","are","am","be"], correct: "is" },
+{ q: "I ____ not busy.", a: ["am","is","are","be"], correct: "am" },
+{ q: "The teachers ____ in the office.", a: ["are","is","am","be"], correct: "are" },
+{ q: "One of my friends ____ here.", a: ["is","are","am","be"], correct: "is" },
+{ q: "The books ____ on the table.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Everyone ____ excited.", a: ["is","are","am","be"], correct: "is" },
+{ q: "We ____ classmates.", a: ["are","is","am","be"], correct: "are" },
+{ q: "He ____ not angry.", a: ["is","are","am","be"], correct: "is" },
+
+{ q: "The dog and the cat ____ friends.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Mathematics ____ difficult for me.", a: ["is","are","am","be"], correct: "is" },
+{ q: "My parents ____ proud.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The news ____ shocking.", a: ["is","are","am","be"], correct: "is" },
+{ q: "You ____ very kind.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The team ____ ready.", a: ["is","are","am","be"], correct: "is" },
+{ q: "Both answers ____ correct.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Some water ____ dirty.", a: ["is","are","am","be"], correct: "is" },
+{ q: "They ____ not at school.", a: ["are","is","am","be"], correct: "are" },
+{ q: "She ____ beautiful.", a: ["is","am","are","be"], correct: "is" },
+
+{ q: "I ____ a student.", a: ["am","is","are","be"], correct: "am" },
+{ q: "The police ____ nearby.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Each of the players ____ ready.", a: ["is","are","am","be"], correct: "is" },
+{ q: "The furniture ____ new.", a: ["is","are","am","be"], correct: "is" },
+{ q: "We ____ not tired.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The flowers ____ beautiful.", a: ["are","is","am","be"], correct: "are" },
+{ q: "My sister ____ a doctor.", a: ["is","am","are","be"], correct: "is" },
+{ q: "Your shoes ____ dirty.", a: ["are","is","am","be"], correct: "are" },
+{ q: "He ____ my neighbor.", a: ["is","are","am","be"], correct: "is" },
+{ q: "The sky ____ blue.", a: ["is","are","am","be"], correct: "is" },
+
+{ q: "We ____ in Surabaya.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The students ____ quiet.", a: ["are","is","am","be"], correct: "are" },
+{ q: "Nobody ____ ready yet.", a: ["is","are","am","be"], correct: "is" },
+{ q: "The milk ____ fresh.", a: ["is","are","am","be"], correct: "is" },
+{ q: "You ____ not alone.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The baby ____ sleepy.", a: ["is","are","am","be"], correct: "is" },
+{ q: "Many people ____ here.", a: ["are","is","am","be"], correct: "are" },
+{ q: "A lot of information ____ missing.", a: ["is","are","am","be"], correct: "is" },
+{ q: "I ____ not afraid.", a: ["am","is","are","be"], correct: "am" },
+{ q: "The class ____ noisy.", a: ["is","are","am","be"], correct: "is" },
+
+{ q: "The chairs ____ broken.", a: ["are","is","am","be"], correct: "are" },
+{ q: "She ____ not at home.", a: ["is","are","am","be"], correct: "is" },
+{ q: "The movie ____ interesting.", a: ["is","are","am","be"], correct: "is" },
+{ q: "We ____ ready now.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The children ____ happy.", a: ["are","is","am","be"], correct: "are" },
+{ q: "It ____ not easy.", a: ["is","are","am","be"], correct: "is" },
+{ q: "My friends ____ outside.", a: ["are","is","am","be"], correct: "are" },
+{ q: "The teacher ____ busy.", a: ["is","are","am","be"], correct: "is" },
+{ q: "I ____ excited today.", a: ["am","is","are","be"], correct: "am" },
+{ q: "The windows ____ open.", a: ["are","is","am","be"], correct: "are" }
+];
+
+
+        class QuizApp {
+            constructor() {
+                this.dataset = [];
+                this.currentQuestionIndex = 0;
+                this.userAnswers = {}; // Map: { questionIndex: selectedOptionString }
+
+                // DOM Elements
+                this.quizArea = document.getElementById('quiz-area');
+                this.controls = document.getElementById('game-controls');
+                this.counter = document.getElementById('question-counter');
+                this.resultArea = document.getElementById('result-area');
+                this.header = document.getElementById('game-header');
+
+                this.init();
+            }
+
+            // --- Initialization Logic ---
+            init() {
+                // Reset State
+                this.currentQuestionIndex = 0;
+                this.userAnswers = {};
+                this.dataset = this.randomizeQuestions(masterData, 10);
+
+                // UI Reset
+                this.resultArea.style.display = 'none';
+                this.header.style.display = 'block';
+                this.quizArea.style.display = 'block';
+                this.controls.style.display = 'flex';
+                document.getElementById('game-nav').style.display = 'grid';
+
+                this.renderNavGrid();
+                this.renderQuestion();
+            }
+
+            // Select N random questions and shuffle their options
+            randomizeQuestions(sourceData, count) {
+                // Shuffle copy of master data
+                let shuffled = [...sourceData].sort(() => 0.5 - Math.random());
+                // Slice first N
+                let selected = shuffled.slice(0, count);
+
+                // Map to prepared objects with shuffled options
+                return selected.map(item => {
+                    const options = [...item.a]; // Copy options
+                    // Fisher-Yates shuffle for options
+                    for (let i = options.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [options[i], options[j]] = [options[j], options[i]];
+                    }
+
+                    return {
+                        question: item.q,
+                        options: options,
+                        correct: item.correct
+                    };
+                });
+            }
+
+            // --- Rendering Logic ---
+            renderQuestion() {
+                const qData = this.dataset[this.currentQuestionIndex];
+
+                // Update Counter
+                this.counter.textContent = `Soal ${this.currentQuestionIndex + 1} / ${this.dataset.length}`;
+
+                // Build HTML for Question Card
+                this.quizArea.innerHTML = `
+                    <div class="question-card active">
+                        <div class="question-text">${qData.question}</div>
+                        <div class="options-grid">
+                            ${qData.options.map((opt, idx) => `
+                                <button class="option-btn" onclick="app.selectOption(${idx})" id="opt-${idx}">
+                                    ${String.fromCharCode(65 + idx)}. ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                this.updateNavGrid();
+                this.renderControls();
+
+                // Restore selection if already answered
+                const savedAns = this.userAnswers[this.currentQuestionIndex];
+                if (savedAns) {
+                    const savedIdx = qData.options.indexOf(savedAns);
+                    if (savedIdx !== -1) {
+                        this.highlightOption(savedIdx);
+                    }
+                }
+            }
+
+            renderControls() {
+                const isLast = this.currentQuestionIndex === this.dataset.length - 1;
+                const answered = this.userAnswers[this.currentQuestionIndex] !== undefined;
+
+                this.controls.innerHTML = `
+                    <button class="btn" id="next-btn" onclick="app.nextQuestion()">
+                        ${isLast ? 'Selesai & Lihat Skor' : (answered ? 'Lanjut' : 'Lewati')} 
+                    </button>
+                `;
+            }
+
+            // --- Interaction Logic ---
+            selectOption(idx) {
+                // Get value from index
+                const val = this.dataset[this.currentQuestionIndex].options[idx];
+
+                // Save answer
+                this.userAnswers[this.currentQuestionIndex] = val;
+
+                // UI Highlight
+                this.highlightOption(idx);
+
+                // Update Nav Grid to show answered status
+                this.updateNavGrid();
+
+                // Re-render controls to update button text from 'Lewati' to 'Lanjut'
+                this.renderControls();
+            }
+
+            highlightOption(idx) {
+                // Remove selected class from all
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(btn => btn.classList.remove('selected'));
+
+                // Add to clicked one using ID
+                const selectedBtn = document.getElementById(`opt-${idx}`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('selected');
+                }
+            }
+
+            nextQuestion() {
+                if (this.currentQuestionIndex < this.dataset.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.renderQuestion();
+                } else {
+                    this.showResults();
+                }
+            }
+
+            // --- Navigation Grid Logic ---
+            renderNavGrid() {
+                const navContainer = document.getElementById('game-nav');
+                navContainer.innerHTML = '';
+
+                this.dataset.forEach((_, index) => {
+                    const box = document.createElement('div');
+                    box.className = 'nav-box';
+                    box.textContent = index + 1;
+                    box.onclick = () => app.jumpToQuestion(index);
+                    box.id = `nav-box-${index}`;
+                    navContainer.appendChild(box);
+                });
+            }
+
+            updateNavGrid() {
+                this.dataset.forEach((_, index) => {
+                    const box = document.getElementById(`nav-box-${index}`);
+                    if (!box) return;
+
+                    // Reset classes
+                    box.className = 'nav-box';
+
+                    // Check if answered
+                    if (this.userAnswers[index] !== undefined) {
+                        box.classList.add('answered');
+                    }
+
+                    // Check if current
+                    if (index === this.currentQuestionIndex) {
+                        box.classList.add('active');
+                    }
+                });
+            }
+
+            jumpToQuestion(index) {
+                this.currentQuestionIndex = index;
+                this.renderQuestion();
+            }
+
+            // --- Scoring & Results ---
+            showResults() {
+                let score = 0;
+                let reviewHTML = '';
+
+                this.dataset.forEach((q, idx) => {
+                    const userAns = this.userAnswers[idx];
+                    const isCorrect = userAns === q.correct;
+                    if (isCorrect) score++;
+
+                    reviewHTML += `
+                        <div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
+                            <div class="review-q">${idx + 1}. ${q.question}</div>
+                            <div class="review-ans">
+                                Jawaban kamu: <span class="${isCorrect ? 'text-correct' : 'text-wrong'}">${userAns}</span>
+                                ${!isCorrect ? `<br>Jawaban benar: <span class="text-correct">${q.correct}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Render Results
+                this.header.style.display = 'none';
+                this.quizArea.style.display = 'none';
+                this.controls.style.display = 'none';
+                document.getElementById('game-nav').style.display = 'none';
+                this.resultArea.style.display = 'block';
+
+                document.getElementById('final-score').textContent = `${score}/${this.dataset.length}`;
+                document.getElementById('review-container').innerHTML = reviewHTML;
+
+                // Status Message
+                const percentage = (score / this.dataset.length) * 100;
+                let msg = "";
+                if (percentage === 100) msg = "Sempurna! Kamu Jenius!";
+                else if (percentage >= 80) msg = "Hebat! Hampir Sempurna.";
+                else if (percentage >= 50) msg = "Lumayan, coba lagi ya!";
+                else msg = "Jangan menyerah, belajar lagi!";
+                document.getElementById('status-message').textContent = msg;
+            }
+        }
+
+        // Initialize App
+        const app = new QuizApp();
+
+    </script>
+</body>
+
+</html>

@@ -117,6 +117,7 @@ body{
   font-size:16px;
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
   overflow-wrap:break-word;
 }
 ::selection{background:var(--brand);color:var(--on-brand)}
@@ -147,6 +148,10 @@ img,svg{display:block;max-width:100%}
   padding:clamp(18px,3vw,40px);
 }
 @media (min-width:1440px){.shell-inner{max-width:1120px}}
+
+/* Headings break evenly instead of leaving a lopsided second line. balance is
+   ignored past a few lines anyway, so it is safe on every title in the app. */
+.home-title,.screen-title,.quiz-title,.modal-head h2{text-wrap:balance}
 
 /* ---------- Topbar: 1 line, 64px on desktop ---------- */
 /* The header sticks while its own bottom padding covers the shell gap, so
@@ -231,7 +236,7 @@ body.quiz-active .topbar{display:none}
   font-family:var(--font-display);font-weight:400;text-transform:uppercase;
   font-size:clamp(1.85rem,4.6vw,2.75rem);line-height:.98;letter-spacing:-.015em;
 }
-.home-sub{color:var(--ink-soft);font-size:clamp(.95rem,1.7vw,1.04rem);max-width:56ch}
+.home-sub{color:var(--ink-soft);font-size:clamp(.95rem,1.7vw,1.04rem);max-width:56ch;text-wrap:pretty}
 .home-actions{display:grid;gap:10px;grid-template-columns:1fr}
 /* One way in: the entry button stretches, and the file, link and code paths
    live as tabs inside the import modal. It is a secondary action, so it does
@@ -291,7 +296,7 @@ body.quiz-active .topbar{display:none}
   font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft);
   text-transform:uppercase;letter-spacing:.16em;
 }
-.settings-group .hint{font-size:.8rem;color:var(--ink-soft);font-weight:500;max-width:58ch}
+.settings-group .hint{font-size:.8rem;color:var(--ink-soft);font-weight:500;max-width:58ch;text-wrap:pretty}
 .pill-group{display:flex;flex-wrap:wrap;gap:8px}
 .pill{
   display:inline-flex;align-items:center;min-height:44px;padding:9px 15px;
@@ -308,7 +313,7 @@ body.quiz-active .topbar{display:none}
 .custom-count.visible{display:flex}
 .custom-count input{
   width:96px;min-height:44px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:var(--r-md);
-  background:#fff;color:var(--ink);font-family:var(--font-mono);font-size:.92rem;
+  background:#fff;color:var(--ink);font-family:var(--font-mono);font-size:1rem;
 }
 .field-error{color:var(--no);font-size:.8rem;min-height:1.2em;font-weight:600}
 .settings-divider{border:none;border-top:1.5px dashed var(--line-strong);margin:2px 0}
@@ -344,7 +349,17 @@ body.quiz-active .topbar{display:none}
   background:var(--surface);box-shadow:var(--pop);overflow-wrap:anywhere;
 }
 .options-grid{display:grid;grid-template-columns:1fr;gap:10px}
-@media (min-width:768px){.options-grid{grid-template-columns:1fr 1fr}}
+/* Two columns read DOWN each column, not across: A C / B D. The row count is
+   half the option count (set by renderQuestion), so a 3- or 5-option question
+   still fills two balanced columns instead of spilling into a third. Phones
+   keep the single stacked column above. */
+@media (min-width:768px){
+  .options-grid{
+    grid-template-columns:1fr 1fr;
+    grid-auto-flow:column;
+    grid-template-rows:repeat(var(--opt-rows,2),auto);
+  }
+}
 .option-btn{
   display:flex;align-items:center;gap:12px;text-align:left;width:100%;min-height:58px;
   padding:14px 16px;border:1.5px solid var(--ink);border-radius:var(--r-md);background:var(--surface);
@@ -362,17 +377,10 @@ body.quiz-active .topbar{display:none}
   transition:background var(--t),color var(--t),border-color var(--t);
 }
 .option-text{overflow-wrap:anywhere}
-/* Teaches the numeric shortcut that already exists. Hidden on touch widths. */
-.option-key{
-  margin-left:auto;flex:0 0 auto;padding:1px 7px;border:1px solid var(--line);border-radius:6px;
-  font-family:var(--font-mono);font-size:.72rem;color:var(--ink-soft);
-}
-@media (max-width:599px){.option-key{display:none}}
 /* Picked answer = the ink card from the radio-card language: inverted surface,
    hard shadow, and the letter chip is the one accent mark in the row. */
 .option-btn.selected{background:var(--ink);border-color:var(--ink);color:var(--surface);box-shadow:3px 4px 0 rgba(27,22,16,.3)}
 .option-btn.selected .option-letter{background:var(--brand);border-color:var(--brand-dark);color:var(--on-brand)}
-.option-btn.selected .option-key{color:var(--surface);border-color:var(--surface)}
 .quiz-nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .nav-strip{
   position:relative;display:flex;flex-wrap:wrap;gap:7px;padding:12px;border:1.5px dashed var(--line-strong);
@@ -492,7 +500,7 @@ body.quiz-active .topbar{display:none}
      title, and the short-screen block below drops it entirely. */
   .progress-track{height:8px}
   .question-text{
-    font-size:clamp(1rem,4.4vw,1.15rem);line-height:1.35;padding:10px 12px;
+    font-size:clamp(1rem,4.4vw,1.15rem);line-height:1.4;padding:10px 12px;
     border-radius:var(--r-lg);
     /* The reserve is everything on the quiz screen that is not the question
        sheet: chrome above it plus the answer grid, nav row and gaps. Measured,
@@ -2580,7 +2588,10 @@ body.quiz-active .topbar{display:none}
     beginQuizSession: function (resetAnswers) {
       if (resetAnswers) this.answers = this.dataset.map(function () { return -1; });
       this._timerQ = -1;
+      // The title is ellipsised on phones (one-row header), so the full name
+      // stays reachable through the native tooltip.
       $('quizTitle').textContent = this.masterTitle;
+      $('quizTitle').setAttribute('title', this.masterTitle);
       $('progressBar').setAttribute('aria-valuemax', String(this.dataset.length));
       this.buildNavStrip();
       this.setNavStripOpen(this.navStripPreferredOpen(), false);
@@ -2700,7 +2711,10 @@ body.quiz-active .topbar{display:none}
       if (!q) return;
       this.current = idx;
 
+      // The title is ellipsised on phones (one-row header), so the full name
+      // stays reachable through the native tooltip.
       $('quizTitle').textContent = this.masterTitle;
+      $('quizTitle').setAttribute('title', this.masterTitle);
       $('counterLabel').textContent = (idx + 1) + ' / ' + this.dataset.length;
       $('progressLabel').textContent = (idx + 1) + '/' + this.dataset.length;
       $('progressBar').setAttribute('aria-valuenow', String(idx + 1));
@@ -2712,6 +2726,8 @@ body.quiz-active .topbar{display:none}
 
       var grid = $('optionsGrid');
       grid.textContent = '';
+      // Column-major fill: half the rows per column (A C / B D on desktop).
+      grid.style.setProperty('--opt-rows', String(Math.ceil(q.shuffledOptions.length / 2)));
       q.shuffledOptions.forEach(function (optText, i) {
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -2725,13 +2741,8 @@ body.quiz-active .topbar{display:none}
         text.className = 'option-text';
         text.textContent = optText; // XSS-safe
         text.dir = isRtl(optText) ? 'rtl' : 'auto';
-        var key = document.createElement('span');
-        key.className = 'option-key';
-        key.setAttribute('aria-hidden', 'true');
-        key.textContent = String(i + 1); // mirrors the 1-9 keyboard shortcut
         btn.appendChild(letter);
         btn.appendChild(text);
-        btn.appendChild(key);
         btn.addEventListener('click', function () { self.selectOption(i); });
         grid.appendChild(btn);
       });

@@ -21,7 +21,7 @@ Panduan singkat untuk agent yang membuka folder ini.
 ## Cara verifikasi perubahan
 
 1. Ekstrak blok `<script>` lalu `node --check` untuk memastikan tidak ada syntax error.
-2. Sajikan lewat server statis, misalnya `npx http-server -p 8471 -s -c-1`, lalu klik setiap kontrol: tombol mulai, load TXT/URL, settings, tema, review, dan modal-modalnya. Saat layar kuis, pastikan header tersembunyi dan halaman mencoba masuk fullscreen; saat kembali ke Home keduanya pulih.
+2. Sajikan lewat server statis, misalnya `npx http-server -p 8471 -s -c-1`, lalu klik setiap kontrol: pilihan peran (Guru/Siswa), tombol × kembali ke pilihan peran, tombol **Buat Soal** (cek `?prompt=` sama persis dengan konstanta `CHATGPT_PROMPT`), tombol mulai, load TXT/URL, settings, tema, review, dan modal-modalnya. Saat layar kuis, pastikan header tersembunyi dan halaman mencoba masuk fullscreen; saat kembali ke Home keduanya pulih.
 3. Uji juga di lebar 320px dan mode gelap. Kontras diukur, bukan dikira-kira.
 4. Untuk menguji jalur serverless tanpa deploy: `vercel dev`, atau import `api/raw.js` langsung di Node (`m.default.fetch(new Request(...))`) dan sajikan lewat server kecil yang memetakan `/api/raw` ke fungsi itu.
 

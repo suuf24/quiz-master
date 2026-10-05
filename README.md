@@ -6,10 +6,12 @@ Quiz platform **single-file** (`index.html`): HTML + CSS + Vanilla JS murni, tan
 
 | Fitur | Keterangan |
 |---|---|
+| 🧑🏫 Landing peran | Layar awal menampilkan **dua tombol besar bertumpuk**: **Guru** dan **Siswa**. Guru membuka ruang pembuatan soal, Siswa membuka layar kuis. Tombol × mengembalikan pilihan peran kapan saja |
+| 🤖 Buat Soal via ChatGPT | Di layar Guru, tombol **Buat Soal** membuka ChatGPT (`chatgpt.com/?prompt=…`, tab baru) dengan prompt wizard siap pakai: tanya mata pelajaran → kelas → bab → subbab → jumlah soal → tingkat kesulitan → preview → baru generate, dalam format satu baris aplikasi ini |
 | 📄 Load TXT | Baca file `.txt` dari perangkat (klik, atau drag & drop); tetap ada di dalam modal impor |
-| 🌐 input kode | Tombol di Home: membuka modal impor langsung di **tab Code** (default), tempel kode Pastebin saja (`pastebin.com/raw/Tnk390bz` → `Tnk390bz`) atau link raw penuh; tab **File / URL** tetap ada untuk baca file .txt dan link **raw text** (Pastebin Raw, GitHub raw, Gist raw) |
+| 🌐 input kode | Tombol di Home dan di layar Guru: membuka modal impor langsung di **tab Code** (default), tempel kode Pastebin saja (`pastebin.com/raw/Tnk390bz` → `Tnk390bz`) atau link raw penuh; tab **File / URL** tetap ada untuk baca file .txt dan link **raw text** (Pastebin Raw, GitHub raw, Gist raw) |
 | 🧾 Format satu baris | Satu soal satu baris, bagian dipisah tanda pipa, opsi benar ditandai `*`; pas untuk file hasil generate ratusan soal |
-| 📋 Copy template | Tombol **Salin template** tepat di bawah baris input Home: contoh format TXT sekali klik, tanpa buka modal impor |
+| 📋 Copy template | Tombol **Salin template** di Home dan layar Guru: contoh format TXT sekali klik, tanpa buka modal impor |
 | 🔗 Shareable URL | `?source=<url>`, `?code=<kode>`, dan `/code=<kode>` otomatis me-load kuis saat halaman dibuka |
 | 🔢 Randomisasi | Soal & opsi diacak dengan **Fisher-Yates** (bukan `sort(random)`) |
 | ⚙️ Settings | Jumlah soal (default **20**; All/5/10/20/Custom 1-200), urutan soal/opsi, timer per soal, tampilkan kunci |
@@ -48,6 +50,8 @@ Cukup buka `index.html` di browser (double-click), atau jalankan server statis:
 npx http-server -p 8080
 # buka http://localhost:8080
 ```
+
+Layar pertama adalah **pilihan peran**: **Guru** membuka tombol **Buat Soal** (ChatGPT dengan prompt wizard siap pakai) plus pemuat soal; **Siswa** membuka layar kuis biasa.
 
 Tombol **Mulai Kuis Contoh** memuat 20 soal bawaan (Benny the Rabbit) memakai parser TXT yang sama seperti file `.txt`.
 
@@ -167,7 +171,8 @@ Vercel melayani `index.html` sebagai static file dan otomatis mengubah [`api/raw
 
 ## 🧩 Daftar Fitur Baru vs Versi Lama
 
-- ✅ Multi-screen: Home / Settings / Quiz / Result (sebelumnya satu layar)
+- ✅ Landing dua peran (Guru / Siswa) sebagai layar awal, dengan tombol **Buat Soal** yang membuka ChatGPT berisi prompt wizard pembuat soal
+- ✅ Multi-screen: Role / Home / Teacher / Settings / Quiz / Result (sebelumnya satu layar)
 - ✅ Home punya satu entri `input kode` yang membuka modal langsung di tab Code (default); tab File dan URL tetap tersedia
 - ✅ Format satu baris per soal (tanpa nomor, opsi benar bertanda `*`); format lama tetap didukung
 - ✅ Tombol Salin template di Home (contoh format TXT langsung ke clipboard)
@@ -200,6 +205,12 @@ Fitur opsional digunakan dengan aman bila tersedia: `requestFullscreen` (prefix 
 
 Perilaku sudah diverifikasi otomatis via browser:
 
+- [x] Layar awal = pilihan peran; dua kartu besar (Guru di atas, Siswa di bawah), ≥88px, tanpa scroll horizontal di 320px
+- [x] Tombol × di layar Guru/Siswa kembali ke pilihan peran; layar kuis tetap menyembunyikan header seperti sebelumnya
+- [x] Tombol **Buat Soal** membuka tab baru dengan `rel="noopener noreferrer"`; teks `?prompt=` sama persis dengan prompt di `index.html` (6.785 karakter, 282 baris)
+- [x] Layar Guru: input kode membuka modal impor di tab Code dengan fokus di kolom kode; Load Kuis (.txt / URL) dan Salin template memakai alur yang sama dengan Home
+- [x] Link share `?source=` langsung memuat kuis saat halaman dibuka (layar peran tidak menahan); jalur `/code=` masih memanggil loader yang sama
+- [x] Kunci i18n baru (`role.*`, `teacher.*`, `a11y.back`) tampil di EN maupun ID
 - [x] Mulai kuis contoh: 20 soal, acak setiap sesi
 - [x] Pilih opsi (klik & tombol `1-4`), pilih ulang = deselect
 - [x] Memilih opsi memperbarui tombol di tempat (tanpa rebuild DOM): animasi masuk tidak terputar ulang — tanpa kedip

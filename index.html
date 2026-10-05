@@ -232,6 +232,9 @@ body.quiz-active .topbar{display:none}
 
 /* ---------- Home: left-aligned sheet header (no centered hero) ---------- */
 .home-header{display:flex;flex-direction:column;gap:12px;max-width:64ch}
+/* The sheet header shares its row with the back-to-role control, so the
+   escape hatch never costs a block of its own. */
+.home-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .home-title{
   font-family:var(--font-display);font-weight:400;text-transform:uppercase;
   font-size:clamp(1.85rem,4.6vw,2.75rem);line-height:.98;letter-spacing:-.015em;
@@ -249,6 +252,40 @@ body.quiz-active .topbar{display:none}
      under it at every width; the two quiet buttons share the row below. */
   .home-actions .home-input-row{grid-column:1/-1}
 }
+/* ---------- Landing: pick a role, two stacked cards ---------- */
+/* Both choices carry the same weight (same card, same icon chip size); only
+   the chip fill differs, accent for the teacher path. Stacked at every width:
+   this is a fork in the flow, not a pair to compare side by side. */
+.role-actions{display:grid;gap:12px}
+.role-btn{
+  display:flex;align-items:center;gap:14px;width:100%;min-height:88px;padding:15px 17px;
+  border:1.5px solid var(--ink);border-radius:var(--r-lg);background:var(--surface);color:var(--ink);
+  box-shadow:var(--pop-sm);text-align:left;
+  transition:transform var(--t),box-shadow var(--t),background var(--t),color var(--t);
+}
+.role-btn:hover{transform:translate(-1px,-1px);box-shadow:4.5px 5.5px 0 var(--sh)}
+.role-btn:active{transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--sh)}
+.role-chip{
+  width:52px;height:52px;flex:0 0 auto;display:grid;place-items:center;
+  border:1.5px solid var(--ink);border-radius:var(--r-md);
+}
+.role-chip .icon{width:26px;height:26px}
+.role-chip-teacher{background:var(--brand);color:var(--on-brand)}
+.role-chip-student{background:var(--ink);color:var(--canvas)}
+.role-copy{display:flex;flex-direction:column;gap:3px;flex:1 1 auto;min-width:0}
+.role-name{
+  font-family:var(--font-display);font-weight:400;text-transform:uppercase;
+  font-size:clamp(1.15rem,3.4vw,1.4rem);line-height:1.05;letter-spacing:-.01em;
+}
+.role-hint{font-size:.85rem;color:var(--ink-soft);text-wrap:pretty}
+.role-arrow{width:20px;height:20px;flex:0 0 auto;color:var(--ink-soft)}
+
+/* ---------- Teacher: the generate step sits above the loader ---------- */
+.teacher-generate{display:grid;gap:10px}
+.teacher-hint{font-size:.85rem;color:var(--ink-soft);max-width:64ch;text-wrap:pretty}
+/* The one anchor styled as a button (Buat Soal). */
+a.btn{text-decoration:none}
+
 .last-quiz{
   display:none;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
   /* Secondary surface, marked as secondary by the dashed hairline used on every
@@ -818,11 +855,48 @@ body.quiz-active .topbar{display:none}
 
   <main class="app-card">
 
-    <!-- ============ SCREEN: HOME ============ -->
-    <section class="screen active" id="screen-home" aria-labelledby="homeHeading">
+    <!-- ============ SCREEN: ROLE (landing) ============ -->
+    <!-- The first screen: pick a role. Teacher opens the question room
+         (ChatGPT wizard link + loader); Student goes to the quiz home. -->
+    <section class="screen active" id="screen-role" aria-labelledby="roleHeading">
       <div class="home-header">
-        <h1 class="home-title" id="homeHeading" data-i18n="home.title">Quiz Master</h1>
-        <p class="home-sub" data-i18n="home.subtitle">Berlatih soal pilihan ganda dengan hasil instan, tanpa akun dan tanpa server.</p>
+        <h1 class="home-title" id="roleHeading" data-i18n="home.title">Quiz Master</h1>
+        <p class="home-sub" data-i18n="role.subtitle">Pilih peran untuk mulai.</p>
+      </div>
+      <div class="role-actions">
+        <button type="button" class="role-btn" id="btnRoleGuru">
+          <span class="role-chip role-chip-teacher" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 9l-10 -4l-10 4l10 4l10 -4v6"/><path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4"/></svg>
+          </span>
+          <span class="role-copy">
+            <span class="role-name" data-i18n="role.teacher">Guru</span>
+            <span class="role-hint" data-i18n="role.teacherHint">Buat soal dengan ChatGPT, lalu muat soalnya di sini.</span>
+          </span>
+          <svg class="icon role-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>
+        </button>
+        <button type="button" class="role-btn" id="btnRoleSiswa">
+          <span class="role-chip role-chip-student" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
+          </span>
+          <span class="role-copy">
+            <span class="role-name" data-i18n="role.student">Siswa</span>
+            <span class="role-hint" data-i18n="role.studentHint">Kerjakan soal: contoh, kode, atau link.</span>
+          </span>
+          <svg class="icon role-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: HOME (student) ============ -->
+    <section class="screen" id="screen-home" aria-labelledby="homeHeading">
+      <div class="home-head-row">
+        <div class="home-header">
+          <h1 class="home-title" id="homeHeading" data-i18n="home.title">Quiz Master</h1>
+          <p class="home-sub" data-i18n="home.subtitle">Berlatih soal pilihan ganda dengan hasil instan, tanpa akun dan tanpa server.</p>
+        </div>
+        <button type="button" class="modal-close" id="btnHomeBack" data-i18n-title="a11y.back" data-i18n-attr="aria-label:a11y.back" aria-label="Back">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
+        </button>
       </div>
       <div class="home-actions">
         <button type="button" class="btn btn-primary btn-block btn-start" id="btnStartSample">
@@ -855,6 +929,47 @@ body.quiz-active .topbar{display:none}
         <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></svg>
         <span data-i18n="home.privacy">Jawaban dan pengaturanmu tidak pernah dikirim ke mana pun. Soal dari sebuah link dibaca langsung dari situsnya; kalau situs itu memblokir browser, fungsi serverless kecil atau proxy CORS publik yang mengambil file itu.</span>
       </p>
+    </section>
+
+    <!-- ============ SCREEN: TEACHER (Guru) ============ -->
+    <!-- The question room: one accent action (the ChatGPT wizard link) and the
+         same import modal the student home uses. The link href is built in JS
+         from the prompt constant, so no 15KB URL lives in the markup. -->
+    <section class="screen" id="screen-teacher" aria-labelledby="teacherHeading">
+      <div class="settings-head">
+        <h2 class="screen-title" id="teacherHeading" data-i18n="teacher.title">Guru</h2>
+        <button type="button" class="modal-close" id="btnTeacherBack" data-i18n-title="a11y.back" data-i18n-attr="aria-label:a11y.back" aria-label="Back">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="teacher-generate">
+        <a class="btn btn-primary btn-block" id="btnBuatSoal" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M11 13l9 -9"/><path d="M15 4h5v5"/></svg>
+          <span data-i18n="teacher.buatSoal">Buat Soal</span>
+        </a>
+        <p class="teacher-hint" data-i18n="teacher.buatSoalHint">Membuka ChatGPT di tab baru dengan prompt wizard siap pakai. Setelah soal selesai, salin hasilnya ke file .txt, link raw, atau kode Pastebin, lalu muat di bawah.</p>
+      </div>
+
+      <div class="settings-group">
+        <h3 data-i18n="teacher.loadTitle">Muat soal</h3>
+        <div class="home-actions">
+          <div class="home-input-row">
+            <button type="button" class="btn btn-secondary btn-block" id="btnTeacherCode">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>
+              <span data-i18n="home.inputCode">input kode</span>
+            </button>
+          </div>
+          <button type="button" class="btn btn-ghost btn-block" id="btnTeacherLoad">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 13l6 0"/><path d="M9 17l6 0"/></svg>
+            <span data-i18n="home.loadQuiz">Load Kuis (.txt / URL)</span>
+          </button>
+          <button type="button" class="btn btn-ghost btn-block" id="btnTeacherTemplate">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/></svg>
+            <span data-i18n="home.copyTemplate">Salin template</span>
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- ============ SCREEN: SETTINGS ============ -->
@@ -1274,6 +1389,7 @@ body.quiz-active .topbar{display:none}
       'a11y.navShow': 'Show question numbers',
       'a11y.navHide': 'Hide question numbers',
       'a11y.option': 'Option',
+      'a11y.back': 'Back to role choice',
       'home.title': 'Quiz Master',
       'home.subtitle': 'Practice multiple-choice quizzes with instant results. No account, no server.',
       'home.startSample': 'Start Sample Quiz',
@@ -1284,6 +1400,15 @@ body.quiz-active .topbar{display:none}
       'home.continueLast': 'Continue your last quiz?',
       'home.continue': 'Continue',
       'home.privacy': 'Your answers and settings never leave this device. A linked quiz is read straight from its host; if that host blocks the browser, a small serverless function or a public CORS proxy fetches just that file.',
+      'role.subtitle': 'Choose a role to get started.',
+      'role.teacher': 'Teacher',
+      'role.teacherHint': 'Create questions with ChatGPT, then load them here.',
+      'role.student': 'Student',
+      'role.studentHint': 'Solve a quiz: sample, code, or link.',
+      'teacher.title': 'Teacher',
+      'teacher.buatSoal': 'Create Questions',
+      'teacher.buatSoalHint': 'Opens ChatGPT in a new tab with a ready-made wizard prompt. Once the questions are ready, copy them into a .txt file, a raw link, or a Pastebin code, then load them below.',
+      'teacher.loadTitle': 'Load questions',
       'settings.title': 'Settings',
       'settings.count': 'Number of questions',
       'settings.all': 'All',
@@ -1393,6 +1518,7 @@ body.quiz-active .topbar{display:none}
       'a11y.navShow': 'Tampilkan nomor soal',
       'a11y.navHide': 'Sembunyikan nomor soal',
       'a11y.option': 'Opsi',
+      'a11y.back': 'Kembali ke pilihan peran',
       'home.title': 'Quiz Master',
       'home.subtitle': 'Berlatih soal pilihan ganda dengan hasil instan, tanpa akun dan tanpa server.',
       'home.startSample': 'Mulai Kuis Contoh',
@@ -1403,6 +1529,15 @@ body.quiz-active .topbar{display:none}
       'home.continueLast': 'Lanjutkan kuis terakhir?',
       'home.continue': 'Lanjutkan',
       'home.privacy': 'Jawaban dan pengaturanmu tidak pernah dikirim ke mana pun. Soal dari sebuah link dibaca langsung dari situsnya; kalau situs itu memblokir browser, fungsi serverless kecil atau proxy CORS publik yang mengambil file itu.',
+      'role.subtitle': 'Pilih peran untuk mulai.',
+      'role.teacher': 'Guru',
+      'role.teacherHint': 'Buat soal dengan ChatGPT, lalu muat soalnya di sini.',
+      'role.student': 'Siswa',
+      'role.studentHint': 'Kerjakan soal: contoh, kode, atau link.',
+      'teacher.title': 'Guru',
+      'teacher.buatSoal': 'Buat Soal',
+      'teacher.buatSoalHint': 'Membuka ChatGPT di tab baru dengan prompt wizard siap pakai. Setelah soal selesai, salin hasilnya ke file .txt, link raw, atau kode Pastebin, lalu muat di bawah.',
+      'teacher.loadTitle': 'Muat soal',
       'settings.title': 'Settings',
       'settings.count': 'Jumlah soal',
       'settings.all': 'Semua',
@@ -2064,6 +2199,297 @@ body.quiz-active .topbar{display:none}
     ''
   ].join('\n');
 
+  /* The wizard prompt behind the Teacher screen's "Buat Soal" button. It is
+     data, kept as one string here (the file's array + join style) and encoded
+     once at boot, so the markup never carries a ~15KB URL. chatgpt.com accepts
+     ?prompt= and prefills the composer with it. */
+  var CHATGPT_PROMPT = [
+    '# AI PEMBUAT LATIHAN SOAL INTERAKTIF',
+    '',
+    'Anda adalah AI yang membantu guru merancang dan membuat latihan soal sekolah.',
+    '',
+    'Tugas utama Anda adalah membantu guru menentukan konfigurasi soal melalui proses interaktif sebelum soal dibuat.',
+    '',
+    'JANGAN langsung membuat soal ketika percakapan dimulai.',
+    '',
+    'Gunakan alur wizard berikut secara berurutan.',
+    '',
+    '1. MATA PELAJARAN',
+    '',
+    'Tanyakan:',
+    '',
+    '"Mata pelajaran apa yang ingin dibuatkan latihannya?"',
+    '',
+    'Contoh:',
+    '- Bahasa Inggris',
+    '- Matematika',
+    '- Bahasa Indonesia',
+    '- IPA',
+    '- IPS',
+    '- PPKn',
+    '- Pendidikan Agama',
+    '- dan lainnya.',
+    '',
+    'Simpan jawaban pengguna sebagai MATA_PELAJARAN.',
+    '',
+    '2. KELAS',
+    '',
+    'Tanyakan:',
+    '',
+    '"Untuk kelas berapa?"',
+    '',
+    'Contoh:',
+    '- Kelas 1',
+    '- Kelas 2',
+    '- Kelas 3',
+    '- Kelas 4',
+    '- Kelas 5',
+    '- Kelas 6',
+    '',
+    'Simpan jawaban sebagai KELAS.',
+    '',
+    '3. BAB MATA PELAJARAN',
+    '',
+    'Tanyakan:',
+    '',
+    '"Bab atau materi utama apa yang ingin dilatihkan?"',
+    '',
+    'Simpan jawaban sebagai BAB.',
+    '',
+    'Setelah pengguna memberikan bab, berikan beberapa contoh subbab yang relevan berdasarkan mata pelajaran, kelas, dan bab yang diberikan.',
+    '',
+    'Format:',
+    '',
+    '"Beberapa subbab yang bisa digunakan:',
+    '',
+    '1. [Subbab 1]',
+    '2. [Subbab 2]',
+    '3. [Subbab 3]',
+    '4. [Subbab 4]',
+    '5. [Subbab 5]',
+    '',
+    'Anda bisa memilih salah satu, beberapa subbab, semua subbab, atau menulis subbab sendiri."',
+    '',
+    'Jika pengguna memilih "Semua subbab", gunakan seluruh subbab yang relevan dengan bab tersebut.',
+    '',
+    'Jangan membuat subbab secara acak. Subbab harus relevan dengan mata pelajaran, kelas, dan bab yang diberikan.',
+    '',
+    'Simpan pilihan sebagai SUBBAB.',
+    '',
+    '4. JUMLAH SOAL',
+    '',
+    'Tanyakan:',
+    '',
+    '"Berapa banyak soal yang ingin dibuat?"',
+    '',
+    'Berikan rekomendasi:',
+    '- 50 soal',
+    '- 100 soal',
+    '- 200 soal',
+    '- 300 soal',
+    '- 500 soal',
+    '',
+    'Pengguna tetap boleh memasukkan jumlah lain.',
+    '',
+    'Batas:',
+    '- Minimum: 50 soal',
+    '- Maksimum: 500 soal',
+    '',
+    'Jika pengguna memasukkan angka di luar batas, minta pengguna memilih jumlah antara 50 sampai 500.',
+    '',
+    'Simpan sebagai JUMLAH_SOAL.',
+    '',
+    '5. TINGKAT KESULITAN',
+    '',
+    'Gunakan konfigurasi default:',
+    '',
+    'Mudah: 25%',
+    'Menengah: 25%',
+    'Sulit: 25%',
+    'HOTS: 25%',
+    '',
+    'Tanyakan:',
+    '',
+    '"Gunakan komposisi tingkat kesulitan default 25% mudah, 25% menengah, 25% sulit, dan 25% HOTS, atau ingin mengubahnya?"',
+    '',
+    'Jika pengguna memilih default, gunakan:',
+    '',
+    'Mudah: 25%',
+    'Menengah: 25%',
+    'Sulit: 25%',
+    'HOTS: 25%',
+    '',
+    'Jika pengguna ingin mengubah, minta persentase masing-masing:',
+    '',
+    'Mudah: __%',
+    'Menengah: __%',
+    'Sulit: __%',
+    'HOTS: __%',
+    '',
+    'Pastikan total seluruh persentase harus tepat 100%.',
+    '',
+    'Jika total tidak 100%, beri tahu pengguna dan minta diperbaiki.',
+    '',
+    'Simpan sebagai TINGKAT_KESULITAN.',
+    '',
+    '6. PREVIEW CONFIGURATION',
+    '',
+    'Setelah seluruh informasi diperoleh, tampilkan preview konfigurasi sebelum membuat soal.',
+    '',
+    'Gunakan format sederhana:',
+    '',
+    'PREVIEW LATIHAN SOAL',
+    '',
+    'Mata Pelajaran: [MATA_PELAJARAN]',
+    'Kelas: [KELAS]',
+    'Bab: [BAB]',
+    'Subbab: [SUBBAB]',
+    'Jumlah Soal: [JUMLAH_SOAL]',
+    '',
+    'Tingkat Kesulitan:',
+    'Mudah: [X]%',
+    'Menengah: [X]%',
+    'Sulit: [X]%',
+    'HOTS: [X]%',
+    '',
+    'Perkiraan Jumlah:',
+    'Mudah: [jumlah]',
+    'Menengah: [jumlah]',
+    'Sulit: [jumlah]',
+    'HOTS: [jumlah]',
+    '',
+    'Tanyakan:',
+    '',
+    '"Apakah konfigurasi ini sudah sesuai?"',
+    '',
+    'Berikan pilihan:',
+    '',
+    '1. Ya, buat soal',
+    '2. Ubah konfigurasi',
+    '',
+    'Jika pengguna memilih "Ubah konfigurasi", tanyakan bagian mana yang ingin diubah dan hanya ulangi langkah yang diperlukan.',
+    '',
+    'Jangan mengulang seluruh wizard jika tidak diperlukan.',
+    '',
+    '7. GENERATE SOAL',
+    '',
+    'Hanya setelah pengguna mengonfirmasi konfigurasi, buat soal.',
+    '',
+    'Soal harus:',
+    '',
+    '- Sesuai dengan mata pelajaran.',
+    '- Sesuai dengan kelas.',
+    '- Sesuai dengan bab.',
+    '- Sesuai dengan subbab yang dipilih.',
+    '- Sesuai dengan jumlah yang diminta.',
+    '- Mengikuti distribusi tingkat kesulitan.',
+    '- Tidak keluar dari materi.',
+    '- Tidak membuat soal yang terlalu mirip satu sama lain.',
+    '- Menggunakan bahasa yang sesuai dengan tingkat perkembangan siswa.',
+    '- Menghindari pertanyaan yang memiliki lebih dari satu jawaban benar.',
+    '- Memastikan hanya ada satu jawaban yang benar untuk setiap soal.',
+    '- Menjaga variasi konteks dan bentuk pertanyaan.',
+    '- Untuk soal HOTS, tingkatkan kemampuan berpikir yang diperlukan, bukan sekadar menggunakan bahasa yang sulit.',
+    '- Soal HOTS tetap harus menggunakan bahasa yang dapat dipahami siswa sesuai kelasnya.',
+    '',
+    'Jika jumlah soal sangat banyak, tetap pertahankan konsistensi format dan distribusi tingkat kesulitan.',
+    '',
+    '8. FORMAT OUTPUT',
+    '',
+    'Output FINAL WAJIB berada di dalam satu codebox.',
+    '',
+    'Jangan memberikan penjelasan sebelum atau sesudah codebox.',
+    '',
+    'Gunakan format:',
+    '',
+    'Title: [Judul latihan]',
+    '',
+    '[Soal] | [Opsi 1] | [Opsi 2] | [Opsi 3] | [Opsi 4]',
+    '',
+    'Jawaban benar wajib diawali dengan tanda *.',
+    '',
+    'Contoh:',
+    '',
+    'Title: Contoh Kuis',
+    '',
+    'Who lives in a green forest? | *Benny the rabbit | A flying dragon | A city dog | A sea fish',
+    'Who does Benny help? | Strangers in a city | *His friends | Robots | Pirates',
+    '',
+    'ATURAN FORMAT OUTPUT',
+    '',
+    '1. Baris pertama wajib:',
+    'Title: [Judul]',
+    '',
+    '2. Setiap soal harus berada dalam satu baris.',
+    '',
+    '3. Format setiap soal:',
+    'Pertanyaan | Opsi 1 | Opsi 2 | Opsi 3 | Opsi 4',
+    '',
+    '4. Jawaban benar wajib diawali dengan tanda *.',
+    '',
+    'Contoh:',
+    '2 + 3 = ? | 4 | *5 | 6 | 7',
+    '',
+    '5. Jangan menggunakan:',
+    'A.',
+    'B.',
+    'C.',
+    'D.',
+    '',
+    'di dalam opsi.',
+    '',
+    '6. Jangan menambahkan nomor soal di awal pertanyaan.',
+    '',
+    '7. Jangan menambahkan "Answer:".',
+    '',
+    '8. Jangan memberikan kunci jawaban terpisah.',
+    '',
+    '9. Jangan memberikan pembahasan.',
+    '',
+    '10. Jangan menggunakan markdown table.',
+    '',
+    '11. Jangan memberikan komentar atau metadata tambahan.',
+    '',
+    '12. Pastikan setiap soal memiliki tepat 4 opsi.',
+    '',
+    '13. Pastikan tepat 1 opsi memiliki tanda *.',
+    '',
+    '14. Tanda * hanya digunakan pada jawaban yang benar.',
+    '',
+    '15. Variasikan posisi jawaban benar secara seimbang antara opsi pertama, kedua, ketiga, dan keempat.',
+    '',
+    '16. Jangan membuat semua jawaban benar berada pada posisi yang sama.',
+    '',
+    '17. Jangan menggunakan tanda "|" di dalam teks pertanyaan maupun opsi selain sebagai pemisah kolom.',
+    '',
+    'ATURAN INTERAKSI',
+    '',
+    '- Jangan melompati pertanyaan wizard.',
+    '- Jangan membuat soal sebelum pengguna melakukan konfirmasi pada Preview Configuration.',
+    '- Jika jawaban pengguna belum jelas, minta klarifikasi.',
+    '- Jika pengguna memberikan beberapa informasi sekaligus, gunakan informasi tersebut dan hanya tanyakan informasi yang masih belum tersedia.',
+    '- Jika pengguna mengubah salah satu konfigurasi, perbarui preview.',
+    '- Jangan kehilangan konfigurasi yang sudah disepakati.',
+    '- Jangan mengubah jumlah soal atau persentase kesulitan tanpa persetujuan pengguna.',
+    '- Gunakan konteks jawaban sebelumnya.',
+    '- Prioritaskan kualitas soal daripada pengulangan pola pertanyaan.',
+    '- Gunakan bahasa yang sesuai dengan kelas siswa.',
+    '- Jangan membuat soal di luar bab atau subbab yang telah dipilih.',
+    '- Pastikan distribusi jumlah soal berdasarkan persentase kesulitan sedekat mungkin dengan konfigurasi yang dipilih.',
+    '- Jika hasil perhitungan persentase menghasilkan angka desimal, bulatkan secara logis dan pastikan total jumlah soal tetap sama dengan jumlah yang diminta.',
+    '- Jangan menggunakan emoji.',
+    '- Jangan menggunakan dekorasi, garis pemisah, atau simbol visual yang tidak diperlukan.',
+    '- Gunakan bahasa yang sederhana, jelas, dan profesional.',
+    '',
+    'MULAI',
+    '',
+    'Mulai percakapan dengan pertanyaan:',
+    '',
+    '"Mata pelajaran apa yang ingin dibuatkan latihannya?"'
+  ].join('\n');
+
+  var CHATGPT_PROMPT_URL = 'https://chatgpt.com/?prompt=' + encodeURIComponent(CHATGPT_PROMPT);
+
   /* ============================================================
    * QuizApp - controller utama
    * ============================================================ */
@@ -2097,12 +2523,13 @@ body.quiz-active .topbar{display:none}
       this.applyTheme();
       this.bindTopbar();
       this.bindNav();
+      this.bindLanding();
       this.bindHome();
       this.bindSettings();
       this.bindImport();
       this.bindModals();
       this.bindKeyboard();
-      this.showScreen('home');
+      this.showScreen('role');
       this.refreshLastQuizBox();
 
       // ?source= / ?code= / /code= auto-load
@@ -2130,7 +2557,7 @@ body.quiz-active .topbar{display:none}
       // The drawer belongs to the quiz screen only: never carry it over to the
       // result or home screen (no focus steal, it is a screen change anyway).
       if (name !== 'quiz' && this.navStripOpen && this.isMobile()) this.closeNavDrawer(false);
-      ['home', 'settings', 'quiz', 'result'].forEach(function (s) {
+      ['role', 'home', 'teacher', 'settings', 'quiz', 'result'].forEach(function (s) {
         $('screen-' + s).classList.toggle('active', s === name);
       });
       // The quiz owns the viewport: the app header hides at every width (and on
@@ -2339,6 +2766,31 @@ body.quiz-active .topbar{display:none}
       mark('grpTheme', s.theme);
       $('customCount').value = s.customCount;
       $('customCountWrap').classList.toggle('visible', s.count === 'custom');
+    },
+
+    /* ---------- landing (role choice) & teacher ---------- */
+    bindLanding: function () {
+      var self = this;
+      $('btnRoleGuru').addEventListener('click', function () { self.showScreen('teacher'); });
+      $('btnRoleSiswa').addEventListener('click', function () { self.showScreen('home'); });
+      $('btnHomeBack').addEventListener('click', function () { self.showScreen('role'); });
+      $('btnTeacherBack').addEventListener('click', function () { self.showScreen('role'); });
+      // One long prompt, one encode: the link carries the whole wizard text.
+      $('btnBuatSoal').setAttribute('href', CHATGPT_PROMPT_URL);
+      $('btnTeacherCode').addEventListener('click', function () {
+        self.switchTab('code');
+        self.openModal('modalImport');
+        $('codeInput').focus();
+      });
+      $('btnTeacherLoad').addEventListener('click', function () {
+        self.switchTab('file');
+        self.openModal('modalImport');
+      });
+      $('btnTeacherTemplate').addEventListener('click', function () {
+        copyText(EXAMPLE_TXT).then(function (ok) {
+          self.toast(QuizI18n.t(ok ? 'toast.copied' : 'toast.copyFail'), ok ? 'success' : 'error');
+        });
+      });
     },
 
     /* ---------- home ---------- */

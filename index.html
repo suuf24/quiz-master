@@ -427,6 +427,12 @@ body.quiz-active .topbar{display:none}
   border-radius:5px;background:var(--surface);font-family:var(--font-mono);font-size:.72rem;color:var(--ink);
 }
 @media (max-width:480px){.kbd-hint{display:none}}
+/* The quiz credit: one small mono row at the very bottom of the quiz screen,
+   shown at every width while the quiz runs. On phones it is the only bottom
+   line (the kbd hint steps aside there). Fixed 11px box (line-height:1) so the
+   fit reserves below can count it exactly: 11px + one gap (10px there, 8px on
+   short screens) was added to both - 508px / - 465px. */
+.quiz-credit{font-family:var(--font-mono);font-size:11px;line-height:1;letter-spacing:.14em;color:var(--ink-soft);text-align:center}
 
 /* ---------- Question numbers: inline grid on wide screens, drawer on phones --
    The shell is a layout no-op on desktop (display:contents keeps #navStrip
@@ -503,11 +509,12 @@ body.quiz-active .topbar{display:none}
     font-size:clamp(1rem,4.4vw,1.15rem);line-height:1.4;padding:10px 12px;
     border-radius:var(--r-lg);
     /* The reserve is everything on the quiz screen that is not the question
-       sheet: chrome above it plus the answer grid, nav row and gaps. Measured,
-       not guessed: the worst case over 320, 375, 414 and 640 at 667 tall (320,
-       where the topbar wraps) with the four-option sample. A taller question
-       scrolls inside the sheet instead of pushing the answers off screen. */
-    max-height:max(96px,calc(100dvh - 508px));
+       sheet: chrome above it plus the answer grid, nav row, the credit row and
+       gaps. Measured, not guessed: the worst case over 320, 375, 414 and 640
+       at 667 tall (320, where the topbar wraps) with the four-option sample,
+       plus the credit row (11px line + 10px gap). A taller question scrolls
+       inside the sheet instead of pushing the answers off screen. */
+    max-height:max(96px,calc(100dvh - 529px));
     overflow-y:auto;overscroll-behavior:contain;
   }
   .options-grid{gap:6px}
@@ -589,8 +596,9 @@ body.quiz-active .topbar{display:none}
   .question-text{
     padding:10px 12px;font-size:1rem;border-radius:var(--r-lg);
     /* Same method as the block above, measured over the same four widths on
-       short screens: the worst case was 320x568. */
-    max-height:max(64px,calc(100dvh - 465px));
+       short screens: the worst case was 320x568, plus the credit row (11px
+       line + 8px gap). */
+    max-height:max(64px,calc(100dvh - 484px));
   }
   .option-btn{min-height:44px;padding:7px 10px;font-size:.92rem}
   .option-letter{width:26px;height:26px;font-size:.78rem}
@@ -989,6 +997,7 @@ body.quiz-active .topbar{display:none}
       </div>
 
       <p class="kbd-hint" data-i18n="quiz.kbdHint">Keyboard: 1-4 pilih, Enter lanjut, panah kiri dan kanan untuk pindah soal</p>
+      <p class="quiz-credit">made by suuf24</p>
     </section>
 
     <!-- ============ SCREEN: RESULT ============ -->

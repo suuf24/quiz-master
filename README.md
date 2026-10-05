@@ -18,6 +18,7 @@ Quiz platform **single-file** (`index.html`): HTML + CSS + Vanilla JS murni, tan
 | ↪️ RTL | Teks soal/opsi beraksen Arab/Ibrani otomatis di-render `dir="rtl"` |
 | 🌗 Tema | Auto / Terang / Gelap di Settings. `Auto` mengikuti `prefers-color-scheme`; pilihan tersimpan di localStorage |
 | ⛶ Fokus kuis | Header disembunyikan dan halaman masuk **fullscreen otomatis** selama layar kuis aktif (keluar saat kuis selesai/ditinggalkan; gagal = diam, aplikasi tetap jalan) |
+| 🪪 Credit | Baris kecil **made by suuf24** di dasar layar kuis, tampil di semua lebar; di HP footer penuh tetap disembunyikan agar soal + jawaban tetap muat satu layar |
 | ⌨️ Keyboard | `1-9` pilih opsi · `Enter` lanjut · panah kiri/kanan navigasi · `Esc` tutup modal |
 | 🔎 Review Jawaban | Modal rinci per soal; yang **salah dijawab naik ke atas**, lalu yang dilewati, lalu yang benar, dan nomor soal tetap nomor aslinya |
 | 🔒 Privasi | File & jawaban **tidak pernah** dikirim ke server manapun |
@@ -202,6 +203,7 @@ Perilaku sudah diverifikasi otomatis via browser:
 - [x] Mulai kuis contoh: 20 soal, acak setiap sesi
 - [x] Pilih opsi (klik & tombol `1-4`), pilih ulang = deselect
 - [x] Memilih opsi memperbarui tombol di tempat (tanpa rebuild DOM): animasi masuk tidak terputar ulang — tanpa kedip
+- [x] Baris credit **made by suuf24** tampil di dasar layar kuis di semua lebar (320/375/414/640), tanpa membuat halaman scroll
 - [x] `Enter` lanjut · `←`/`→` navigasi · klik nomor di nav-strip untuk lompat
 - [x] Nomor soal bisa disembunyikan (aria-expanded + pilihan disimpan di localStorage)
 - [x] Lewati soal (tidak dijawab), dihitung *skipped* di hasil

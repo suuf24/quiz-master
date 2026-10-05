@@ -2096,11 +2096,23 @@ body.quiz-active .topbar{display:none}
       this.showScreen('home');
       this.refreshLastQuizBox();
 
-      // ?source= auto-load
+      // ?source= / ?code= / /code= auto-load
       var params = new URLSearchParams(window.location.search);
       var src = params.get('source');
       if (src) {
         this.loadFromUrl(src);
+      } else {
+        var code = params.get('code');
+        if (!code) {
+          // The /code=<...> form is served through the vercel.json rewrite, so
+          // the address bar still carries the value in the path.
+          var m = window.location.pathname.match(/^\/code=(.+)$/);
+          if (m) {
+            code = m[1].replace(/\/+$/, '');
+            try { code = decodeURIComponent(code); } catch (e) { /* keep as typed */ }
+          }
+        }
+        if (code) this.loadFromCode(code);
       }
     },
 
@@ -2788,7 +2800,16 @@ body.quiz-active .topbar{display:none}
       var q = this.dataset[this.current];
       if (!q) return;
       this.answers[this.current] = (this.answers[this.current] === i) ? -1 : i;
-      this.renderQuestion(this.current, false);
+      // Flip the picked row in place. Rebuilding the grid here would replay
+      // the optIn entrance animation on every pick (a visible blink); only
+      // the classes, aria state, and the answered dot actually change.
+      var self = this;
+      $('optionsGrid').querySelectorAll('.option-btn').forEach(function (btn, k) {
+        var on = self.answers[self.current] === k;
+        btn.classList.toggle('selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      this.updateNavStrip();
       this.persistLast();
     },
     jumpTo: function (i) {

@@ -11,6 +11,7 @@ Panduan singkat untuk agent yang membuka folder ini.
 | `index.html` | Seluruh aplikasi (markup, CSS, JS) |
 | `api/raw.js` | Fungsi serverless Vercel `/api/raw` (jalur cadangan CORS, Node runtime) |
 | `package.json` | Penanda ESM untuk `api/` (tanpa dependency) |
+| `vercel.json` | Rewrite Vercel: `/code=<kode>` → `index.html` (link pendek) |
 | `README.md` | Dokumentasi fitur, format TXT, deploy, kompatibilitas |
 | `DESIGN.md` | Arah desain (identitas, palet, tipografi, dial) |
 | `sample-quiz.txt` | Contoh 5 soal untuk uji Load TXT / URL |

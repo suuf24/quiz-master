@@ -10,7 +10,7 @@ Quiz platform **single-file** (`index.html`): HTML + CSS + Vanilla JS murni, tan
 | 🌐 input kode | Tombol di Home: membuka modal impor langsung di **tab Code** (default), tempel kode Pastebin saja (`pastebin.com/raw/Tnk390bz` → `Tnk390bz`) atau link raw penuh; tab **File / URL** tetap ada untuk baca file .txt dan link **raw text** (Pastebin Raw, GitHub raw, Gist raw) |
 | 🧾 Format satu baris | Satu soal satu baris, bagian dipisah tanda pipa, opsi benar ditandai `*`; pas untuk file hasil generate ratusan soal |
 | 📋 Copy template | Tombol **Salin template** tepat di bawah baris input Home: contoh format TXT sekali klik, tanpa buka modal impor |
-| 🔗 Shareable URL | `?source=<url>` otomatis me-load kuis saat halaman dibuka |
+| 🔗 Shareable URL | `?source=<url>`, `?code=<kode>`, dan `/code=<kode>` otomatis me-load kuis saat halaman dibuka |
 | 🔢 Randomisasi | Soal & opsi diacak dengan **Fisher-Yates** (bukan `sort(random)`) |
 | ⚙️ Settings | Jumlah soal (default **20**; All/5/10/20/Custom 1-200), urutan soal/opsi, timer per soal, tampilkan kunci |
 | ⏱ Timer | Off / 10 / 20 / 30 / 60 detik per soal, auto-advance (dihitung *skipped*) |
@@ -137,7 +137,14 @@ Setelah load via URL, salin link dari address bar (tombol Share sudah dihapus; t
 https://domainmu.vercel.app/?source=https%3A%2F%2Fpastebin.com%2Fraw%2Fabc123
 ```
 
-Siapa pun yang membuka link itu langsung melihat kuisnya dimuat otomatis.
+Untuk kuis Pastebin ada dua bentuk link pendek; nilainya sama seperti isi kotak **Code** di modal impor (kode telanjang atau link raw penuh):
+
+```
+https://domainmu.vercel.app/?code=Tnk390bz   (tanpa konfigurasi, jalan di host statis mana pun)
+https://domainmu.vercel.app/code=Tnk390bz    (bentuk path, dilayani rewrite vercel.json)
+```
+
+Bentuk `/code=` membaca kodenya dari address bar setelah `vercel.json` menulis-ulang path ke `index.html`; bentuk `?code=` tidak butuh konfigurasi apa pun. Siapa pun yang membuka link itu langsung melihat kuisnya dimuat otomatis.
 
 ## ▲ Deploy ke Vercel
 
@@ -155,7 +162,7 @@ Atau:
 2. Buka [vercel.com/new](https://vercel.com/new) → import repo.
 3. Framework Preset: **Other** (biarkan kosong) → **Deploy**.
 
-Vercel melayani `index.html` sebagai static file dan otomatis mengubah [`api/raw.js`](api/raw.js) menjadi fungsi serverless di `/api/raw` (Node runtime yang sama, tanpa dependency npm). Tidak perlu `vercel.json`, build step, ataupun environment variable.
+Vercel melayani `index.html` sebagai static file dan otomatis mengubah [`api/raw.js`](api/raw.js) menjadi fungsi serverless di `/api/raw` (Node runtime yang sama, tanpa dependency npm). Tanpa build step dan tanpa environment variable; satu-satunya config adalah `vercel.json` (rewrite bentuk link `/code=<kode>` ke `index.html`, lihat bagian Shareable URL).
 
 ## 🧩 Daftar Fitur Baru vs Versi Lama
 
@@ -194,6 +201,7 @@ Perilaku sudah diverifikasi otomatis via browser:
 
 - [x] Mulai kuis contoh: 20 soal, acak setiap sesi
 - [x] Pilih opsi (klik & tombol `1-4`), pilih ulang = deselect
+- [x] Memilih opsi memperbarui tombol di tempat (tanpa rebuild DOM): animasi masuk tidak terputar ulang — tanpa kedip
 - [x] `Enter` lanjut · `←`/`→` navigasi · klik nomor di nav-strip untuk lompat
 - [x] Nomor soal bisa disembunyikan (aria-expanded + pilihan disimpan di localStorage)
 - [x] Lewati soal (tidak dijawab), dihitung *skipped* di hasil
@@ -206,6 +214,7 @@ Perilaku sudah diverifikasi otomatis via browser:
 - [x] Load URL raw sukses / gagal CORS (pesan ramah + retry + Load TXT)
 - [x] Normalisasi `pastebin.com/xxx` → `pastebin.com/raw/xxx`
 - [x] Load lewat **code**: kode telanjang `Tnk390bz` dan link raw penuh sama-sama menuju `pastebin.com/raw/<kode>`
+- [x] Link `?code=Tnk390bz` dan `/code=Tnk390bz` memuat kuis otomatis; kode tidak valid → modal error + tombol Coba Lagi
 - [x] i18n EN ⇄ ID, persist setelah reload
 - [x] Settings tersimpan; jumlah > tersedia → memakai semua yang ada
 - [x] Timer aktif → auto-advance saat habis; chip timer menguning/merah
@@ -230,4 +239,5 @@ Yang sebaiknya diuji manual di perangkat asli:
 | `sample-quiz.txt` | Contoh soal untuk uji Load TXT/URL |
 | `api/raw.js` | Fungsi serverless Vercel `/api/raw` (jalur cadangan CORS) |
 | `package.json` | Penanda ESM untuk fungsi `api/` (tanpa dependency) |
+| `vercel.json` | Rewrite Vercel untuk bentuk link `/code=<kode>` |
 | `0.000.001.html` | Backup versi lama (jangan diubah) |
